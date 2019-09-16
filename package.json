@@ -1,0 +1,37 @@
+{
+  "name": "begin-app",
+  "description": "Begin Create React App + API",
+  "version": "0.0.0",
+  "proxy": "http://localhost:3333",
+  "dependencies": {
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "react-scripts": "3.1.1"
+  },
+  "scripts": {
+    "start": "npm run api & react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "api": "cross-env NODE_ENV=testing ARC_LOCAL=1 npx sandbox"
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@architect/sandbox": "^1.3.14",
+    "cross-env": "^5.2.1"
+  }
+}
