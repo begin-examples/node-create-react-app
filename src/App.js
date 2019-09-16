@@ -8,9 +8,12 @@ const App = () => {
 
   useEffect(() => {
     async function fetchData () {
-      let data = await (await fetch('/api')).json()
-      console.log('Message: ', data.message)
-      setMessage(data.message)
+      try {
+        let data = await (await fetch('/api')).json()
+        setMessage(data.message)
+      } catch (err) {
+        setMessage(err.message)
+      }
     }
     fetchData()
   })
