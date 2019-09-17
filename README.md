@@ -1,6 +1,6 @@
 # Begin basic Create React App + API
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+[Create React App](https://create-react-app.dev/)'s starter app, extended by [Begin](https://begin.com)-based API endpoints.
 
 ## Available Scripts
 
@@ -18,7 +18,7 @@ You will also see any lint errors in the console.
 
 Runs the api tests
 
-### `npm test:interactive`
+### `npm test:i`
 
 Launches the test runner in the interactive watch mode.<br>
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
@@ -32,6 +32,10 @@ The build is minified and the filenames include the hashes.<br>
 Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+
+### `npm run serve`
+
+Builds the app for production then launches the sandbox server at [http://localhost:3333](http://localhost:3333) so you can test the production build.
 
 ### `npm run eject`
 
