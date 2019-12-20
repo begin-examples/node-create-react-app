@@ -4,6 +4,14 @@ $BADGE
 
 [Create React App](https://create-react-app.dev/)'s starter app, extended by [Begin](https://begin.com)-based API endpoints.
 
+
+## Deploy your own
+
+$DEPLOY
+
+Deploy your own clone of this app to Begin!
+
+
 ## Available Scripts
 
 In the project directory, you can run:
