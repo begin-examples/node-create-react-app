@@ -1,6 +1,6 @@
-<img src="https://static.begin.app/node-create-react-app/readme-banner.png" width="561">
+<img src="https://static.begin.app/node-create-react-app/readme-banner.png" width="966">
 
----
+$BADGE
 
 [![Deploy to Begin](https://static.begin.com/deploy-to-begin.svg)](https://begin.com/apps/create?template=https://github.com/begin-examples/node-create-react-app)
 
@@ -8,7 +8,7 @@
 
 ## Deploy your own
 
-\$DEPLOY
+$DEPLOY
 
 Deploy your own clone of this app to Begin!
 
