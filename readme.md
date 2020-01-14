@@ -2,13 +2,11 @@
 
 $BADGE
 
-[![Deploy to Begin](https://static.begin.com/deploy-to-begin.svg)](https://begin.com/apps/create?template=https://github.com/begin-examples/node-create-react-app)
-
 [Create React App](https://create-react-app.dev/)'s starter app, extended by [Begin](https://begin.com)-based API endpoints.
 
 ## Deploy your own
 
-$DEPLOY
+[![Deploy to Begin](https://static.begin.com/deploy-to-begin.svg)](https://begin.com/apps/create?template=https://github.com/begin-examples/node-create-react-app)
 
 Deploy your own clone of this app to Begin!
 
