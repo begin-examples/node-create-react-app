@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@architect/sandbox": "^1.6.0",
-    "@begin/data": "^1.1.7",
+    "@begin/data": "^1.2.0",
     "cross-env": "^7.0.0",
     "tap-spec": "^5.0.0",
     "tape": "^4.13.0",
