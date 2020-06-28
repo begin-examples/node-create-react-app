@@ -52,7 +52,7 @@ test('get / (async/await style)', async t => {
   }
 })
 
-test('Shut down sandbox', t=> {
+test('Shut down Sandbox', t => {
   t.plan(1)
   end()
   tiny.get({url},

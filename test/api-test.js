@@ -25,7 +25,7 @@ test('get /api', async t => {
   }
 })
 
-test('End', async t => {
+test('End', t => {
   t.plan(1)
   end()
   tiny.get({url: base},
