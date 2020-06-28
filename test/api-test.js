@@ -25,8 +25,15 @@ test('get /api', async t => {
   }
 })
 
-test('End', async t => {
+test('End', t => {
   t.plan(1)
   end()
-  t.ok(true, 'shutdown')
+  tiny.get({url: base},
+  function win (err, result) {
+    if (err) {
+      t.equal(err.code, 'ECONNREFUSED', 'Sandbox succssfully shut down')
+    } else {
+      t.fail('Sandbox did not shut down')
+    }
+  })
 })
