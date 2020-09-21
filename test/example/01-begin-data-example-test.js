@@ -15,9 +15,10 @@ test('Set up env', t => {
   t.ok(data.destroy, 'data.destroy ready')
 })
 
-test('Set up env', t => {
+test('Start the Sandbox', async t => {
   t.plan(1)
-  t.ok(sandbox, 'sandbox loaded')
+  let result = await sandbox.start()
+  t.equal(result, 'Sandbox successfully started')
 })
 
 test('data.set (one document)', async t => {
