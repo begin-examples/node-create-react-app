@@ -15,11 +15,10 @@ test('Set up env', t => {
   t.ok(data.destroy, 'data.destroy ready')
 })
 
-let end // Saves a reference to be used later to shut down the sandbox
-test('Start sandbox', async t=> {
+test('Start the Sandbox', async t => {
   t.plan(1)
-  end = await sandbox.start()
-  t.ok(end, 'Sandbox started!')
+  let result = await sandbox.start()
+  t.equal(result, 'Sandbox successfully started')
 })
 
 test('data.set (one document)', async t => {
@@ -119,8 +118,8 @@ test('data.get can read an entire table', async t => {
   logJSON(result,null,2)
 })
 
-test('Shut down sandbox', async t=> {
+test('Shut down the Sandbox', async t => {
   t.plan(1)
-  end()
-  t.ok(true, 'shutdown')
+  let result = await sandbox.end()
+  t.equal(result, 'Sandbox successfully shut down')
 })
