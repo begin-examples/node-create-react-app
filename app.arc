@@ -3,6 +3,7 @@ begin-app
 
 @static
 folder build
+spa true
 
 @http
 get /api
