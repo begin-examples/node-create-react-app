@@ -4,8 +4,14 @@
   "version": "0.0.0",
   "proxy": "http://localhost:3333",
   "arc": {
+    "app": "react-hello",
     "http": [
-      {"/api": {"method": "get", "src":"/api"}}
+      {
+        "/api": {
+          "method": "get",
+          "src": "/api"
+        }
+      }
     ],
     "static": {
       "folder": "build",
