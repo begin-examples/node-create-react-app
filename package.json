@@ -3,10 +3,25 @@
   "description": "Begin Create React App + API",
   "version": "0.0.0",
   "proxy": "http://localhost:3333",
+  "arc": {
+    "app": "react-hello",
+    "http": [
+      {
+        "/api": {
+          "method": "get",
+          "src": "/api"
+        }
+      }
+    ],
+    "static": {
+      "folder": "build",
+      "spa": true
+    }
+  },
   "dependencies": {
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "react-scripts": "3.4.4"
+    "react-scripts": "^4.0.3"
   },
   "scripts": {
     "start": "run-p start:react api",
