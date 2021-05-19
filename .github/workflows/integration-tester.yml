@@ -99,7 +99,7 @@ jobs:
         run: echo "CONFIG_RUNTIMES=$(cat .github/workflows/integration-tests/generated/runtime-config.json | jq '.runtimes')" >> $GITHUB_ENV
 
       - name: Add Deno if needed
-        if: ${{env.TEST_CONFIG_RUNTIMES}}=='deno'
+        if: ${{env.CONFIG_RUNTIMES == 'deno'}}
         uses: denoland/setup-deno@main
         with:
           deno-version: v1.x
@@ -123,12 +123,12 @@ jobs:
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Sandbox Tests
-        if: ${{env.HAS_CUSTOM_TESTS}}==true
+        if: ${{env.HAS_CUSTOM_TESTS == true}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
         #fails if no custom tests present
       - name: Run Basic Tests
-        if: ${{env.TEST_CONFIG_RUN}}=='basic'
+        if: ${{env.TEST_CONFIG_RUN == 'basic'}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
 
       - name: Notify
@@ -136,7 +136,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && failure()
         with:
           type: ${{ job.status }}
-          job_name: "*Sandbox Smoke Tests*"
+          job_name: "*Sandbox Integration Tests*"
           url: ${{ secrets.BX_SLACK_WEBHOOK }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -211,14 +211,14 @@ jobs:
         run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Run Basic Tests
-        if: ${{env.TEST_CONFIG_RUN}}=='basic'
+        if: ${{env.TEST_CONFIG_RUN == 'basic'}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Check for custom tests
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Staging Tests
-        if: ${{env.HAS_CUSTOM_TESTS}}==true
+        if: ${{env.HAS_CUSTOM_TESTS == true}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
@@ -230,7 +230,7 @@ jobs:
         if: github.ref == 'refs/heads/main' && failure()
         with:
           type: ${{ job.status }}
-          job_name: "*Staging Smoke Tests*"
+          job_name: "*Staging Integration Tests*"
           url: ${{ secrets.BX_SLACK_WEBHOOK }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
