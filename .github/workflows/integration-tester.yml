@@ -44,7 +44,7 @@ jobs:
 
   staging_tests_exist:
     runs-on: ubuntu-latest
-    needs: cancel
+    needs: cancel_if_duplicate
     steps:
       - name: Check out repo
         uses: actions/checkout@v2
