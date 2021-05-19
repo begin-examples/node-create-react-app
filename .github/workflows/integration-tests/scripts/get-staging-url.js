@@ -7,7 +7,11 @@ const stackInfo = JSON.parse(stackInfoFile)
 const outputs = stackInfo.Stacks[0].Outputs
 
 
-const url = outputs.filter(out => out.OutputKey === 'API')[0].OutputValue
+let url = outputs.filter(out => out.OutputKey === 'API')[0].OutputValue
+
+if (!url) {
+  url = outputs.filter(out => out.OutputKey === 'BucketURL')[0].OutputValue
+}
 
 if (!url) {
   throw new Error('App name not found')

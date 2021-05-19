@@ -70,6 +70,9 @@ jobs:
   sandbox_tests:
     needs: sandbox_tests_exist
     runs-on: ubuntu-latest
+    env:
+      #below sets default to true and will confirm later in workflow
+      HAS_CUSTOM_TESTS: true
     strategy:
       matrix:
         node-version: [10.x, 12.x, 14.x]
@@ -117,10 +120,10 @@ jobs:
         run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Check for custom tests
-        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "NO_CUSTOM_TESTS=true" >> $GITHUB_ENV
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Sandbox Tests
-        if: ${{!env.NO_CUSTOM_TESTS}}
+        if: ${{env.HAS_CUSTOM_TESTS}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
         #fails if no custom tests present
@@ -139,8 +142,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   staging_tests:
-    #Setup
     runs-on: ubuntu-latest
+    env:
+      #below sets default to true and will confirm later in workflow
+      HAS_CUSTOM_TESTS: true
     needs: [staging_tests_exist, sandbox_tests]
 
     strategy:
@@ -194,7 +199,7 @@ jobs:
         run: npx arc deploy --name ${{env.UNIQUE_STACK}}
 
       - name: Find App Name
-        run: echo "APP_NAME=$(node .github/workflows/integration-tests/scripts/get-app-name.js -i sam.json)" >> $GITHUB_ENV
+        run: echo "APP_NAME=$(node .github/workflows/integration-tests/scripts/get-app-name.js -i sam.json || npx arc deploy --name ${{env.UNIQUE_STACK}} --dry-run | head | rev | cut -d ' ' -f1 | rev)" >> $GITHUB_ENV
 
       - name: Calculate Stack Name
         run: echo "AWS_STACK_NAME=$(node .github/workflows/integration-tests/scripts/get-stack-name.js --app-name ${{env.APP_NAME}} --unique-stack ${{env.UNIQUE_STACK}})" >> $GITHUB_ENV
@@ -210,10 +215,10 @@ jobs:
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Check for custom tests
-        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "NO_CUSTOM_TESTS=true" >> $GITHUB_ENV
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Staging Tests
-        if: ${{!env.NO_CUSTOM_TESTS}}
+        if: ${{env.HAS_CUSTOM_TESTS}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
