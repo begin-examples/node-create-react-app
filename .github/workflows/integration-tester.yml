@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  cancel:
+  cancel_if_duplicate:
     runs-on: ubuntu-latest
     steps:
       - name: Cancel Previous Runs
