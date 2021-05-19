@@ -123,7 +123,7 @@ jobs:
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Sandbox Tests
-        if: ${{env.HAS_CUSTOM_TESTS}}
+        if: ${{env.HAS_CUSTOM_TESTS}}==true
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
         #fails if no custom tests present
@@ -218,7 +218,7 @@ jobs:
         run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
 
       - name: Run Custom Staging Tests
-        if: ${{env.HAS_CUSTOM_TESTS}}
+        if: ${{env.HAS_CUSTOM_TESTS}}==true
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
 
       - name: Destroy Infrastructure
