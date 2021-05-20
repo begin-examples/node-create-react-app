@@ -199,7 +199,7 @@ jobs:
         run: npx arc deploy --name ${{env.UNIQUE_STACK}}
 
       - name: Find App Name
-        run: echo "APP_NAME=$(node .github/workflows/integration-tests/scripts/get-app-name.js -i sam.json || npx arc deploy --name ${{env.UNIQUE_STACK}} --dry-run | head | rev | cut -d ' ' -f1 | rev)" >> $GITHUB_ENV
+        run: echo "APP_NAME=$(node .github/workflows/integration-tests/scripts/get-app-name.js )" >> $GITHUB_ENV
 
       - name: Calculate Stack Name
         run: echo "AWS_STACK_NAME=$(node .github/workflows/integration-tests/scripts/get-stack-name.js --app-name ${{env.APP_NAME}} --unique-stack ${{env.UNIQUE_STACK}})" >> $GITHUB_ENV
