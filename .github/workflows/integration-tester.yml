@@ -18,6 +18,7 @@ jobs:
           access_token: ${{ github.token }}
 
   sandbox_tests_exist:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     needs: cancel_if_duplicate
     steps:
@@ -43,6 +44,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   staging_tests_exist:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     needs: cancel_if_duplicate
     steps:
@@ -68,6 +70,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   sandbox_tests:
+    timeout-minutes: 30
     needs: sandbox_tests_exist
     runs-on: ubuntu-latest
     env:
@@ -142,6 +145,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   staging_tests:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     env:
       #below sets default to true and will confirm later in workflow
@@ -224,6 +228,10 @@ jobs:
       - name: Destroy Infrastructure
         if: ${{ always() }}
         run: npx arc destroy --app ${{ env.APP_NAME }} --name ${{env.UNIQUE_STACK}} --force --now
+
+      - name: Delete Stack if Destroy Failed
+        if: ${{ always() }}
+        run: aws cloudformation delete-stack --stack-name ${{env.AWS_STACK_NAME}}
 
       - name: Notify
         uses: homoluctus/slatify@master
