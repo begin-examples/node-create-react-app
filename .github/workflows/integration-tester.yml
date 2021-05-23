@@ -35,7 +35,7 @@ jobs:
 
       - name: Notify
         uses: homoluctus/slatify@master
-        if: github.ref == 'refs/heads/main' && failure()
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
         with:
           type: ${{ job.status }}
           job_name: "*No Sandbox Tests Found*"
@@ -61,7 +61,7 @@ jobs:
 
       - name: Notify
         uses: homoluctus/slatify@master
-        if: github.ref == 'refs/heads/main' && failure()
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
         with:
           type: ${{ job.status }}
           job_name: "*No Staging Tests Found*"
@@ -136,7 +136,7 @@ jobs:
 
       - name: Notify
         uses: homoluctus/slatify@master
-        if: github.ref == 'refs/heads/main' && failure()
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
         with:
           type: ${{ job.status }}
           job_name: "*Sandbox Integration Tests*"
@@ -235,7 +235,7 @@ jobs:
 
       - name: Notify
         uses: homoluctus/slatify@master
-        if: github.ref == 'refs/heads/main' && failure()
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
         with:
           type: ${{ job.status }}
           job_name: "*Staging Integration Tests*"
