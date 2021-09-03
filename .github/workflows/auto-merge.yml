@@ -1,7 +1,7 @@
 name: auto-merge
 
 on:
-  pull_request:
+  pull_request_target:
 
 jobs:
   auto-merge:
@@ -10,4 +10,5 @@ jobs:
       - uses: actions/checkout@v2
       - uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
-          github-token: ${{ secrets.PAT }}
+          target: minor
+          github-token: ${{ secrets.BX_GITHUB_PAT }}

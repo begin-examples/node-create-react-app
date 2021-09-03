@@ -78,7 +78,7 @@ jobs:
       HAS_CUSTOM_TESTS: true
     strategy:
       matrix:
-        node-version: [10.x, 12.x, 14.x]
+        node-version: [12.x, 14.x]
         os: [windows-latest, ubuntu-latest, macOS-latest]
     steps:
       - name: Check out repo
@@ -143,20 +143,46 @@ jobs:
           url: ${{ secrets.BX_SLACK_WEBHOOK }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
+ 
+  check_user_permission:
+    outputs:
+      has-permission: ${{ steps.check.outputs.has-permission }}
+    runs-on: ubuntu-latest
+    name: A job to check user's permission level
+    steps:
+      # Check for write permission
+      - name: Check user permission
+        id: check
+        uses: scherermichael-oss/action-has-permission@master
+        with:
+          required-permission: write
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # Use the output from the `check` step
+      - name: Run only if user has sufficient permissions
+        if: steps.check.outputs.has-permission
+        run: echo "HAS_PERMISSION=true"
+      - name: Run only if user has NOT sufficient permissions
+        if: "! steps.check.outputs.has-permission"
+        run: echo "HAS_PERMISSION=false"
 
+
+        
   staging_tests:
     timeout-minutes: 30
+    if: needs.check_user_permission.outputs.has-permission
     runs-on: ubuntu-latest
     env:
       #below sets default to true and will confirm later in workflow
       HAS_CUSTOM_TESTS: true
-    needs: [staging_tests_exist, sandbox_tests]
+    needs: [staging_tests_exist, sandbox_tests, check_user_permission]
 
     strategy:
       matrix:
         node-version: [12.x]
 
     steps:
+
       - name: Check out repo
         uses: actions/checkout@v2
 

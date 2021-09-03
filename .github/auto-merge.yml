@@ -1,3 +1,15 @@
+#- match:
+#    dependency_name: aws-sdk
+#    update_type: semver:minor
+
 - match:
-    dependency_type: all
-    update_type: "semver:minor"
+    dependency_type: development
+    update_type: semver:major 
+
+- match:
+    dependency_type: production
+    update_type: security:minor # includes patch updates!
+
+- match:
+    dependency_type: production
+    update_type: semver:minor
