@@ -1,0 +1,271 @@
+name: RC Integration Tester
+# This workflow is automatically synchronized to this file from the integration tester repository. Any local changes will be overwritten.
+
+on:
+  schedule:
+    - cron: "0 50 19 23 AUG"  
+  workflow_dispatch:
+
+jobs:
+  cancel_if_duplicate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.0
+        with:
+          access_token: ${{ github.token }}
+
+  sandbox_tests_exist:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs: cancel_if_duplicate
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+      - name: Read Test Config
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
+
+        #fails if no custom tests present
+      - name: check for custom tests if no sync tests added
+        if: ${{env.TEST_CONFIG_RUN=='none'}}
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js  ||  exit 1
+
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
+        with:
+          type: ${{ job.status }}
+          job_name: "*No Sandbox Tests Found*"
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  staging_tests_exist:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    needs: cancel_if_duplicate
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+      - name: Read Test Config
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
+
+        #fails if no custom tests present
+      - name: check for custom tests if no sync tests added
+        if: ${{env.TEST_CONFIG_RUN=='none'}}
+        run: test -f .github/workflows/integration-tests/custom/**staging-test.js  ||  exit 1
+
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
+        with:
+          type: ${{ job.status }}
+          job_name: "*No Staging Tests Found*"
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  sandbox_tests:
+    timeout-minutes: 30
+    needs: sandbox_tests_exist
+    runs-on: ubuntu-latest
+    env:
+      #below sets default to true and will confirm later in workflow
+      HAS_CUSTOM_TESTS: true
+    strategy:
+      matrix:
+        node-version: [12.x, 14.x]
+        os: [windows-latest, ubuntu-latest, macOS-latest]
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Env
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Git ref:    ${{ github.ref }}"
+          echo "GH actor:   ${{ github.actor }}"
+          echo "SHA:        ${{ github.sha }}"
+          VER=`node --version`; echo "Node ver:   $VER"
+          VER=`npm --version`; echo "npm ver:    $VER"
+
+      - name: Look for needed runtimes
+        run: echo "CONFIG_RUNTIMES=$(cat .github/workflows/integration-tests/generated/runtime-config.json | jq '.runtimes')" >> $GITHUB_ENV
+
+      - name: Add Deno if needed
+        if: ${{env.CONFIG_RUNTIMES == 'deno'}}
+        uses: denoland/setup-deno@main
+        with:
+          deno-version: v1.x
+
+      - name: Install
+        run: npm install
+
+      # - name: Install Architect
+      #   run: npm i @architect/architect
+
+      - name: Install Sandbox RC
+        run: npm i @architect/sandbox@4.1.0-RC.0
+
+      - name: Install Test Dependencies
+        run: npm i tape tap-spec tiny-json-http
+
+      - name: Build if needed
+        run: npm run build --if-present
+
+      - name: Read Test Config
+        run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
+
+      - name: Check for custom tests
+        run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
+
+      - name: Run Custom Sandbox Tests
+        if: ${{env.HAS_CUSTOM_TESTS == true}}
+        run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
+
+        #fails if no custom tests present
+      - name: Run Basic Tests
+        if: ${{env.TEST_CONFIG_RUN == 'basic'}}
+        run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
+
+      - name: Notify
+        uses: homoluctus/slatify@master
+        if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
+        with:
+          type: ${{ job.status }}
+          job_name: "*Sandbox Integration Tests*"
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
+          commit: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+ 
+  # check_user_permission:
+  #   outputs:
+  #     has-permission: ${{ steps.check.outputs.has-permission }}
+  #   runs-on: ubuntu-latest
+  #   name: A job to check user's permission level
+  #   steps:
+  #     # Check for write permission
+  #     - name: Check user permission
+  #       id: check
+  #       uses: scherermichael-oss/action-has-permission@master
+  #       with:
+  #         required-permission: write
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     # Use the output from the `check` step
+  #     - name: Run only if user has sufficient permissions
+  #       if: steps.check.outputs.has-permission
+  #       run: echo "HAS_PERMISSION=true"
+  #     - name: Run only if user has NOT sufficient permissions
+  #       if: "! steps.check.outputs.has-permission"
+  #       run: echo "HAS_PERMISSION=false"
+
+
+        
+  #staging_tests:
+  #  timeout-minutes: 30
+  #  if: needs.check_user_permission.outputs.has-permission
+  #  runs-on: ubuntu-latest
+  #  env:
+  #    #below sets default to true and will confirm later in workflow
+  #    HAS_CUSTOM_TESTS: true
+  #  needs: [staging_tests_exist, sandbox_tests, check_user_permission]
+
+  #  strategy:
+  #    matrix:
+  #      node-version: [14.x]
+
+  #  steps:
+
+  #    - name: Check out repo
+  #      uses: actions/checkout@v2
+
+  #    - name: Set up Node.js
+  #      uses: actions/setup-node@v1
+  #      with:
+  #        node-version: ${{ matrix.node-version }}
+
+  #    - name: Env
+  #      run: |
+  #        echo "Event name: ${{ github.event_name }}"
+  #        echo "Git ref:    ${{ github.ref }}"
+  #        echo "GH actor:   ${{ github.actor }}"
+  #        echo "SHA:        ${{ github.sha }}"
+  #        VER=`node --version`; echo "Node ver:   $VER"
+  #        VER=`npm --version`; echo "npm ver:    $VER"
+
+  #    - name: Configure AWS credentials from Test account
+  #      uses: aws-actions/configure-aws-credentials@v1
+  #      with:
+  #        aws-access-key-id: ${{ secrets.BX_AWS_ACCESS_KEY_ID }}
+  #        aws-secret-access-key: ${{ secrets.BX_AWS_SECRET_ACCESS_KEY }}
+  #        aws-region: us-east-1
+
+  #    - name: Install
+  #      run: npm install
+
+  #    - name: Install Architect
+  #      run: npm i @architect/architect
+
+  #    - name: Build if needed
+  #      run: npm run build --if-present
+
+  #    - name: Install Test Dependencies
+  #      run: npm i tape tap-spec tiny-json-http
+
+  #    - name: Install Script Dependencies
+  #      run: npm i yargs
+
+  #    - name: Set Stack Name
+  #      run: echo "UNIQUE_STACK=b${GITHUB_SHA::7}$(date +%d)" >> $GITHUB_ENV
+
+  #    - name: Find App Name
+  #      run: echo "APP_NAME=$(node .github/workflows/integration-tests/scripts/get-app-name.js )" >> $GITHUB_ENV
+
+  #    - name: Calculate Stack Name
+  #      run: echo "AWS_STACK_NAME=$(node .github/workflows/integration-tests/scripts/get-stack-name.js --app-name ${{env.APP_NAME}} --unique-stack ${{env.UNIQUE_STACK}})" >> $GITHUB_ENV
+
+  #    - name: Deploy Staging
+  #      run: npx arc deploy --name ${{env.UNIQUE_STACK}}
+
+  #    - name: Find Stack Url
+  #      run: echo "STAGING_URL=$(aws cloudformation describe-stacks --stack-name ${{env.AWS_STACK_NAME}} | node .github/workflows/integration-tests/scripts/get-staging-url.js)" >> $GITHUB_ENV
+
+  #    - name: Read Test Config
+  #      run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
+
+  #    - name: Run Basic Tests
+  #      if: ${{env.TEST_CONFIG_RUN == 'basic'}}
+  #      run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
+
+  #    - name: Check for custom tests
+  #      run: test -f .github/workflows/integration-tests/custom/**sandbox-test.js || echo "HAS_CUSTOM_TESTS=false" >> $GITHUB_ENV
+
+  #    - name: Run Custom Staging Tests
+  #      if: ${{env.HAS_CUSTOM_TESTS == true}}
+  #      run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/custom/**staging-test.js | npx tap-spec
+
+  #    - name: Destroy Infrastructure
+  #      if: ${{ always() }}
+  #      run: npx arc destroy --app ${{ env.APP_NAME }} --name ${{env.UNIQUE_STACK}} --force --now
+
+  #    # - name: Delete Stack if Destroy Failed
+  #    #   if: ${{ always() }}
+  #    #   run: aws cloudformation delete-stack --stack-name ${{env.AWS_STACK_NAME}}
+
+  #    - name: Notify
+  #      uses: homoluctus/slatify@master
+  #      if: (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master') && failure()
+  #      with:
+  #        type: ${{ job.status }}
+  #        job_name: "*Staging Integration Tests*"
+  #        url: ${{ secrets.BX_SLACK_WEBHOOK }}
+  #        commit: true
+  #        token: ${{ secrets.GITHUB_TOKEN }}
