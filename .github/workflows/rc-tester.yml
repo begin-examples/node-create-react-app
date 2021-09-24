@@ -3,7 +3,7 @@ name: RC Integration Tester
 
 on:
   schedule:
-    - cron: "20 22 23 AUG *"
+    - cron: "0 4 24 SEP *"
   workflow_dispatch:
 
 jobs:
