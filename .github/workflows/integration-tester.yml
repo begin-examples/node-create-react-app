@@ -39,7 +39,7 @@ jobs:
         with:
           type: ${{ job.status }}
           job_name: "*No Sandbox Tests Found*"
-          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -65,7 +65,7 @@ jobs:
         with:
           type: ${{ job.status }}
           job_name: "*No Staging Tests Found*"
-          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -140,7 +140,7 @@ jobs:
         with:
           type: ${{ job.status }}
           job_name: "*Sandbox Integration Tests*"
-          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
  
@@ -265,6 +265,6 @@ jobs:
         with:
           type: ${{ job.status }}
           job_name: "*Staging Integration Tests*"
-          url: ${{ secrets.BX_SLACK_WEBHOOK }}
+          url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
