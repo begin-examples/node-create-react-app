@@ -78,7 +78,7 @@ jobs:
       HAS_CUSTOM_TESTS: true
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [14.x]
         os: [windows-latest, ubuntu-latest, macOS-latest]
     steps:
       - name: Check out repo
