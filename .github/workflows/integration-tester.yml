@@ -99,7 +99,7 @@ jobs:
           VER=`npm --version`; echo "npm ver:    $VER"
 
       - name: Look for needed runtimes
-        run: echo "CONFIG_RUNTIMES=$(cat .github/workflows/integration-tests/generated/runtime-config.json | jq '.runtimes')" >> $GITHUB_ENV
+        run: echo "CONFIG_RUNTIMES=$(cat .github/workflows/integration-tests/generated/runtime-config.json | jq '.runtime')" >> $GITHUB_ENV
 
       - name: Add Deno if needed
         #TODO: double quotes should be fixed in the check for this variable.
@@ -242,7 +242,7 @@ jobs:
         run: echo "TEST_CONFIG_RUN=$(cat .github/workflows/integration-tests/generated/tests-config.json | jq '.run')" >> $GITHUB_ENV
 
       - name: Run Basic Tests
-        if: ${{env.TEST_CONFIG_RUN == 'basic'}}
+        if: ${{env.TEST_CONFIG_RUN == '"basic"'}}
         run: QUIET=1 STAGING_URL=${{ env.STAGING_URL }} npx tape .github/workflows/integration-tests/generated/**staging-test.js | npx tap-spec
 
       - name: Check for custom tests
