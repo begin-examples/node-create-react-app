@@ -129,9 +129,9 @@ jobs:
         if: ${{env.HAS_CUSTOM_TESTS == true}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/custom/**sandbox-test.js | npx tap-spec
 
-        #fails if no custom tests present
       - name: Run Basic Tests
-        if: ${{env.TEST_CONFIG_RUN == 'basic'}}
+        #TODO: double quotes should be fixed in the check for this variable.
+        if: ${{env.TEST_CONFIG_RUN == '"basic"'}}
         run: QUIET=1 npx tape .github/workflows/integration-tests/generated/**sandbox-test.js | npx tap-spec
 
       - name: Notify
