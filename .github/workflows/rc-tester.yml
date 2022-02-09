@@ -3,7 +3,7 @@ name: RC Integration Tester
 
 on:
   schedule:
-    - cron: "0 4 24 SEP *"
+    - cron: "30 14 9 FEB *"
   workflow_dispatch:
 
 jobs:
@@ -108,11 +108,11 @@ jobs:
       - name: Install
         run: npm install
 
-      # - name: Install Architect
-      #   run: npm i @architect/architect
+      - name: Install Architect
+        run: npm i @architect/architect@RC
 
-      - name: Install Sandbox RC
-        run: npm i @architect/sandbox@4.1.0-RC.0
+      #- name: Install Sandbox RC
+      #  run: npm i @architect/sandbox
 
       - name: Install Test Dependencies
         run: npm i tape tap-spec tiny-json-http
@@ -144,7 +144,7 @@ jobs:
           url: ${{ secrets.BX_SLACK_BX_CHANNEL }}
           commit: true
           token: ${{ secrets.GITHUB_TOKEN }}
- 
+
   # check_user_permission:
   #   outputs:
   #     has-permission: ${{ steps.check.outputs.has-permission }}
@@ -167,8 +167,6 @@ jobs:
   #       if: "! steps.check.outputs.has-permission"
   #       run: echo "HAS_PERMISSION=false"
 
-
-        
   #staging_tests:
   #  timeout-minutes: 30
   #  if: needs.check_user_permission.outputs.has-permission
