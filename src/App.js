@@ -24,7 +24,7 @@ const App = () => {
         <p>{message}</p>
         <p>Change me!</p>
         <p>
-          Edited <code>src/App.js</code> and saved.
+          Edited <code>src/App.js</code> and saved as a new branch.
         </p>
         <a
           className="App-link"
